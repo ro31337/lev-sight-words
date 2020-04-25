@@ -43,6 +43,11 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function removeElement(id) {
+  var elem = document.getElementById(id);
+  if (elem) elem.parentNode.removeChild(elem);
+}
+
 (async () => {
   'use strict';
 
@@ -54,9 +59,10 @@ function sleep(ms) {
     { word: 'for', url: `${baseUrl}/word-for.mp3` },
     { word: 'the', url: `${baseUrl}/word-the.mp3` },
   ];
+  const outroUrl = `${baseUrl}/outro.mp3`;
 
   addGlobalStyle(`
-    .xx-blocker {
+    #xx-blocker {
       position: absolute;
       top: 0;
       left: 0;
@@ -87,8 +93,13 @@ function sleep(ms) {
 
   const blockScreen = () => {
     const div = document.createElement("div");
-    div.setAttribute('class', 'xx-blocker');
+    div.id = 'xx-blocker';
     document.body.appendChild(div);
+  };
+
+  const unblockScreen = () => {
+    removeElement('xx-word');
+    removeElement('xx-blocker');
   };
 
   const disableScroll = () => {
@@ -97,6 +108,18 @@ function sleep(ms) {
 
   const enableScroll = () => {
     document.body.classList.remove('disable-scroll');
+  };
+
+  const pauseVideo = () => {
+    try {
+      document.getElementById('movie_player').pauseVideo();
+    } catch {}
+  };
+
+  const playVideo = () => {
+    try {
+      document.getElementById('movie_player').playVideo();
+    } catch {}
   };
 
   const playUrl = (url) => {
@@ -119,7 +142,7 @@ function sleep(ms) {
   };
 
   const onInterval = async () => {
-    document.getElementById('movie_player').pauseVideo();
+    pauseVideo();
     disableScroll();
     blockScreen();
     showWord('✋');
@@ -131,11 +154,10 @@ function sleep(ms) {
       showWord(obj.word);
       await playUrl(obj.url);
     }
-
-    //await sleep(1000)
-
-
-    // document.getElementById('movie_player').resumeVideo();
+    await playUrl(outroUrl);
+    enableScroll();
+    unblockScreen();
+    playVideo();
 
     // TODO: set interval when complete
   };
