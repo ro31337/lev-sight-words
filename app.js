@@ -8,6 +8,9 @@
 // @grant        none
 // ==/UserScript==
 
+let gInterval = null;
+const activationInterval = 60 * 15; // in seconds
+
 function addGlobalStyle(css) {
   var head, style;
   head = document.getElementsByTagName('head')[0];
@@ -51,7 +54,6 @@ function removeElement(id) {
 (async () => {
   'use strict';
 
-  const activationInterval = 3; // in seconds
   const baseUrl = 'https://raw.githubusercontent.com/ro31337/lev-sight-words/master';
   const introUrl = `${baseUrl}/intro.mp3`;
   const words = [
@@ -125,6 +127,7 @@ function removeElement(id) {
   const playUrl = (url) => {
     return new Promise((resolve) => {
       const mySound = new Audio(url);
+      mySound.volume = 0.25;
       mySound.onended = resolve;
       mySound.play();
     });
@@ -141,7 +144,7 @@ function removeElement(id) {
     div.innerText = word;
   };
 
-  const onInterval = async () => {
+  const main = async () => {
     pauseVideo();
     disableScroll();
     blockScreen();
@@ -158,9 +161,32 @@ function removeElement(id) {
     enableScroll();
     unblockScreen();
     playVideo();
-
-    // TODO: set interval when complete
   };
 
-  setTimeout(onInterval, activationInterval * 1000);
+  const onInterval = async () => {
+    console.log('interval');
+    const recordedTimestamp = (localStorage.xxTimestamp || Date.now()) * 1;
+    let recordedCnt = (localStorage.xxCnt || 0) * 1;
+
+    const diff = Date.now() - recordedTimestamp;
+
+    // If last recorded timestamp was a long time ago (more than 5 seconds), then browser was closed,
+    // reset the counter
+    if (diff > 5000) {
+      recordedCnt = 0;
+    }
+
+    // Run every N seconds
+    if (recordedCnt % activationInterval === 0) {
+      clearInterval(gInterval);
+      await main();
+      // resume interval
+      gInterval = setInterval(onInterval, 1000);
+    }
+
+    localStorage.xxTimestamp = Date.now();
+    localStorage.xxCnt = recordedCnt + 1;
+  };
+
+  gInterval = setInterval(onInterval, 1000);
 })();
