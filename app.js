@@ -174,10 +174,7 @@ function removeElement(id) {
     // reset the counter
     if (diff > 5000) {
       recordedCnt = 0;
-    }
-
-    // Run every N seconds
-    if (recordedCnt % activationInterval === 0) {
+    } else if (recordedCnt % activationInterval === 0) {
       clearInterval(gInterval);
       await main();
       // resume interval
