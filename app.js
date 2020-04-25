@@ -43,7 +43,7 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-(function () {
+(async () => {
   'use strict';
 
   const activationInterval = 3; // in seconds
@@ -56,22 +56,47 @@ function sleep(ms) {
   ];
 
   addGlobalStyle(`
-    .blocker {
+    .xx-blocker {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: yellow;
+      background-color: #f0f0f0;
       z-index: 9999999;
-      position: fixed;
+    }
+
+    #xx-word {
+      z-index: 99999999;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      font-size: 90px;
+      font-family: Arial;
+      color: #333;
+      position: absolute;
+      display: grid;
+      place-items: center center;
+    }
+
+    body.disable-scroll {
+      overflow: hidden;
     }
   `);
 
   const blockScreen = () => {
     const div = document.createElement("div");
-    div.setAttribute('class', 'blocker');
+    div.setAttribute('class', 'xx-blocker');
     document.body.appendChild(div);
+  };
+
+  const disableScroll = () => {
+    document.body.classList.add('disable-scroll');
+  };
+
+  const enableScroll = () => {
+    document.body.classList.remove('disable-scroll');
   };
 
   const playUrl = (url) => {
@@ -82,12 +107,31 @@ function sleep(ms) {
     });
   };
 
-  const onInterval = () => {
+  const showWord = (word) => {
+    // get or create element
+    let div = document.getElementById('xx-word');
+    if (!div) {
+      div = document.createElement('div');
+      div.id = 'xx-word';
+      document.body.appendChild(div);
+    }
+    div.innerText = word;
+  };
+
+  const onInterval = async () => {
     document.getElementById('movie_player').pauseVideo();
+    disableScroll();
     blockScreen();
-    playUrl(introUrl).then(() => {
-      console.log('ENDED OK!');
-    });
+    showWord('✋');
+    await playUrl(introUrl);
+    shuffleArray(words);
+
+    for (let i = 0; i < words.length; i++) {
+      const obj = words[i];
+      showWord(obj.word);
+      await playUrl(obj.url);
+    }
+
     //await sleep(1000)
 
 
