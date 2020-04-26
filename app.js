@@ -109,6 +109,14 @@ function removeElement(id) {
       border-radius: 15px;
     }
 
+    #xx-quiz span.correct:active {
+      background-color: #E0FFDD;
+    }
+
+    #xx-quiz span.correct:not(:active) {
+      transition: background-color 3000ms step-end;
+    }
+
     #xx-quiz span.incorrect:not(:active) {
       /* now keep red background for 1s */
       transition: background-color 1000ms step-end;
