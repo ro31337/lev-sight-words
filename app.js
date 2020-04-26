@@ -181,9 +181,9 @@ function removeElement(id) {
 
     console.log(`recorded timestamp: ${recordedTimestamp}, recordedCnt: ${recordedCnt}, diff: ${diff}`);
 
-    // If last recorded timestamp was a long time ago (more than 5 seconds), then browser was closed,
+    // If last recorded timestamp was a long time ago (more than 1 minute), then browser was closed,
     // reset the counter.
-    if (diff > 5000) {
+    if (diff > 60000) {
       recordedCnt = 0;
     }
 
