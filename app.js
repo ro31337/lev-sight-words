@@ -9,7 +9,7 @@
 // ==/UserScript==
 
 let gInterval = null;
-const activationInterval = 3; //60 * 15; // in seconds
+const activationInterval = 60 * 15; // in seconds
 
 function addGlobalStyle(css) {
   var head, style;
@@ -61,9 +61,9 @@ function removeElement(id) {
   const noUrl = `${baseUrl}/no.mp3`;
 
   const words = [
-    { word: 'and', url: `${baseUrl}/word-and.mp3`, testUrl: `${baseUrl}/word-and-test.mp3` },
-    { word: 'for', url: `${baseUrl}/word-for.mp3`, testUrl: `${baseUrl}/word-for-test.mp3` },
-    { word: 'the', url: `${baseUrl}/word-the.mp3`, testUrl: `${baseUrl}/word-the-test.mp3` },
+    { word: 'and', id: 1, url: `${baseUrl}/word-and.mp3`, testUrl: `${baseUrl}/word-and-test.mp3` },
+    { word: 'for', id: 2, url: `${baseUrl}/word-for.mp3`, testUrl: `${baseUrl}/word-for-test.mp3` },
+    { word: 'the', id: 3, url: `${baseUrl}/word-the.mp3`, testUrl: `${baseUrl}/word-the-test.mp3` },
   ];
   const outroUrl = `${baseUrl}/outro.mp3`;
 
@@ -184,6 +184,7 @@ function removeElement(id) {
   const unblockScreen = () => {
     removeElement('xx-word');
     removeElement('xx-blocker');
+    removeElement('xx-quiz');
   };
 
   const disableScroll = () => {
@@ -226,12 +227,12 @@ function removeElement(id) {
     div.innerText = word;
   };
 
-  const showQuiz = (words, correctWord) => {
+  const showQuiz = async (words, selectedObj) => {
     // Generate quiz html
     let html = `<div id="xx-quiz">`;
     for (let i = 0; i < 3; i++) {
       const obj = words[i];
-      html += `<span id="xx-quiz-${i}" class="${obj.word === correctWord ? 'correct' : 'incorrect'}">${obj.word}</span>`;
+      html += `<span id="xx-quiz-${obj.id}" class="${obj.word === selectedObj.word ? 'correct' : 'incorrect'}">${obj.word}</span>`;
     }
     html += `</div>`;
 
@@ -242,47 +243,61 @@ function removeElement(id) {
       document.body.appendChild(div);
     }
 
-    // Set click handlers
-
+    // Show
     div.innerHTML = html;
+
+    // Play file
+    playUrl(selectedObj.testUrl);
+
+    return new Promise(async (resolve) => {
+      document.getElementById('xx-quiz-' + selectedObj.id).onclick = async () => {
+        await playUrl(correctUrl);
+        resolve();
+      };
+    });
+  };
+
+  const memorize = async () => {
+    showWord('✋');
+    // await playUrl(introUrl);
+
+    for (let i = 0; i < words.length; i++) {
+      const obj = words[i];
+      showWord(obj.word);
+      await playUrl(obj.url);
+    }
+    await playUrl(outroUrl);
+  };
+
+  const quiz = async() => {
+    // test with the same sequence for now (to be improved later)
+    await playUrl(timeForTestUrl);
+
+    // Test 3 words
+    for (let i = 0; i < 3; i++) {
+      const selectedObj = words[i];
+      await showQuiz(words, selectedObj);
+      // show quiz here
+    }
+    removeElement('xx-quiz');
   };
 
   const main = async () => {
     pauseVideo();
     disableScroll();
     blockScreen();
-    showWord('✋');
     //await playUrl(introUrl);
     shuffleArray(words);
 
-    // show
-    // for (let i = 0; i < words.length; i++) {
-    //   const obj = words[i];
-    //   showWord(obj.word);
-    //   await playUrl(obj.url);
-    // }
-
-    // remove word
-    removeElement('xx-word');
-
-    // test with the same sequence for now (to be improved later)
-    //await playUrl(timeForTestUrl);
-
-    // Test 3 words
-    for (let i = 0; i < 3; i++) {
-      const obj = words[i];
-      showQuiz(words, obj.word);
-      await playUrl(obj.testUrl);
-      // show quiz here
+    if (Date.now() % 2 === 0) {
+      await memorize();
+    } else {
+      await quiz();
     }
 
-    await playUrl(outroUrl);
-
-    // Time for test
-
-    //enableScroll();
-    //unblockScreen();
-    //playVideo();
+    enableScroll();
+    unblockScreen();
+    playVideo();
   };
 
   // Debug with:
