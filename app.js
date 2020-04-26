@@ -78,7 +78,7 @@ function removeElement(id) {
       z-index: 9999999;
     }
 
-    #xx-word {
+    #xx-word, #xx-quiz {
       z-index: 99999999;
       top: 0;
       left: 0;
@@ -92,6 +92,74 @@ function removeElement(id) {
       place-items: center center;
     }
 
+    #xx-quiz {
+      animation: makeVisible 0s 1s forwards;
+      visibility: hidden;
+    }
+
+    @keyframes makeVisible {
+      to   { visibility: visible; }
+    }
+
+    #xx-quiz span {
+      background-color: white;
+      padding: 0 60px;
+      cursor: pointer;
+      border: solid 2px #999;
+      border-radius: 15px;
+    }
+
+    #xx-quiz span.incorrect:not(:active) {
+      /* now keep red background for 1s */
+      transition: background-color 1000ms step-end;
+      -webkit-animation-name: wobble;
+      animation-name: wobble;
+      -webkit-animation-duration:          0.5s;
+      -webkit-animation-iteration-count:   1;
+      -webkit-animation-timing-function:   linear;
+      -webkit-transform-origin:            50% 100%;
+    }
+
+    #xx-quiz span.incorrect:active {
+      background-color: red;
+    }
+
+    @-webkit-keyframes wobble {
+      0% {
+        -webkit-transform: none;
+        transform: none;
+      }
+
+      15% {
+        -webkit-transform: translate3d(-25%, 0, 0) rotate3d(0, 0, 1, -5deg);
+        transform: translate3d(-25%, 0, 0) rotate3d(0, 0, 1, -5deg);
+      }
+
+      30% {
+        -webkit-transform: translate3d(20%, 0, 0) rotate3d(0, 0, 1, 3deg);
+        transform: translate3d(20%, 0, 0) rotate3d(0, 0, 1, 3deg);
+      }
+
+      45% {
+        -webkit-transform: translate3d(-15%, 0, 0) rotate3d(0, 0, 1, -3deg);
+        transform: translate3d(-15%, 0, 0) rotate3d(0, 0, 1, -3deg);
+      }
+
+      60% {
+        -webkit-transform: translate3d(10%, 0, 0) rotate3d(0, 0, 1, 2deg);
+        transform: translate3d(10%, 0, 0) rotate3d(0, 0, 1, 2deg);
+      }
+
+      75% {
+        -webkit-transform: translate3d(-5%, 0, 0) rotate3d(0, 0, 1, -1deg);
+        transform: translate3d(-5%, 0, 0) rotate3d(0, 0, 1, -1deg);
+      }
+
+      100% {
+        -webkit-transform: none;
+        transform: none;
+      }
+    }
     body.disable-scroll {
       overflow: hidden;
     }
@@ -150,12 +218,33 @@ function removeElement(id) {
     div.innerText = word;
   };
 
+  const showQuiz = (words, correctIndex) => {
+    // Generate quiz html
+    let html = `<div id="xx-quiz">`;
+    for (let i = 0; i < 3; i++) {
+      const obj = words[i];
+      html += `<span id="xx-quiz-${i}" class="${i === correctIndex ? 'correct' : 'incorrect'}">${obj.word}</span>`;
+    }
+    html += `</div>`;
+
+    // Create element
+    let div = document.getElementById('xx-quiz');
+    if (!div) {
+      div = document.createElement('div');
+      document.body.appendChild(div);
+    }
+
+    // Set click handlers
+
+    div.innerHTML = html;
+  };
+
   const main = async () => {
     pauseVideo();
     disableScroll();
     blockScreen();
     showWord('✋');
-    await playUrl(introUrl);
+    //await playUrl(introUrl);
     shuffleArray(words);
 
     // show
@@ -169,11 +258,12 @@ function removeElement(id) {
     removeElement('xx-word');
 
     // test with the same sequence for now (to be improved later)
-    await playUrl(timeForTestUrl);
+    //await playUrl(timeForTestUrl);
 
     // Test 3 words
     for (let i = 0; i < 3; i++) {
       const obj = words[i];
+      showQuiz(words, i);
       await playUrl(obj.testUrl);
       // show quiz here
     }
@@ -182,9 +272,9 @@ function removeElement(id) {
 
     // Time for test
 
-    enableScroll();
-    unblockScreen();
-    playVideo();
+    //enableScroll();
+    //unblockScreen();
+    //playVideo();
   };
 
   // Debug with:
