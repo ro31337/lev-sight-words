@@ -56,10 +56,14 @@ function removeElement(id) {
 
   const baseUrl = 'https://raw.githubusercontent.com/ro31337/lev-sight-words/master';
   const introUrl = `${baseUrl}/intro.mp3`;
+  const timeForTestUrl = `${baseUrl}/time-for-test.mp3`;
+  const correctUrl = `${baseUrl}/correct.mp3`;
+  const noUrl = `${baseUrl}/no.mp3`;
+
   const words = [
-    { word: 'and', url: `${baseUrl}/word-and.mp3` },
-    { word: 'for', url: `${baseUrl}/word-for.mp3` },
-    { word: 'the', url: `${baseUrl}/word-the.mp3` },
+    { word: 'and', url: `${baseUrl}/word-and.mp3`, testUrl: `${baseUrl}/word-and-test.mp3` },
+    { word: 'for', url: `${baseUrl}/word-for.mp3`, testUrl: `${baseUrl}/word-for-test.mp3` },
+    { word: 'the', url: `${baseUrl}/word-the.mp3`, testUrl: `${baseUrl}/word-the-test.mp3` },
   ];
   const outroUrl = `${baseUrl}/outro.mp3`;
 
@@ -91,6 +95,8 @@ function removeElement(id) {
     body.disable-scroll {
       overflow: hidden;
     }
+
+
   `);
 
   const blockScreen = () => {
@@ -158,6 +164,10 @@ function removeElement(id) {
       await playUrl(obj.url);
     }
     await playUrl(outroUrl);
+
+    // Time for test
+
+
     enableScroll();
     unblockScreen();
     playVideo();
