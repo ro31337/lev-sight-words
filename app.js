@@ -4,7 +4,7 @@
 // @version      0.1
 // @description  Shows sight words quiz while watching youtube videos
 // @author       Roman Pushkin
-// @match        https://www.youtube.com/watch*
+// @match        https://www.youtube.com/*
 // @grant        none
 // ==/UserScript==
 
@@ -167,10 +167,19 @@ function removeElement(id) {
   // localStorage.removeItem('xxCnt'); localStorage.removeItem('xxTimestamp');
   const onInterval = async () => {
     console.log('interval');
+
+    // tick only if video is currently playing,
+    // see https://developers.google.com/youtube/iframe_api_reference
+    if (document.getElementById('movie_player').getPlayerState() !== 1) {
+      console.log('skip interval');
+      return;
+    }
+
     const recordedTimestamp = (localStorage.xxTimestamp || Date.now()) * 1;
     let recordedCnt = (localStorage.xxCnt || 0) * 1;
-
     const diff = Date.now() - recordedTimestamp;
+
+    console.log(`recorded timestamp: ${recordedTimestamp}, recordedCnt: ${recordedCnt}, diff: ${diff}`);
 
     // If last recorded timestamp was a long time ago (more than 5 seconds), then browser was closed,
     // reset the counter.
