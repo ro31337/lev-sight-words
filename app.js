@@ -226,12 +226,12 @@ function removeElement(id) {
     div.innerText = word;
   };
 
-  const showQuiz = (words, correctIndex) => {
+  const showQuiz = (words, correctWord) => {
     // Generate quiz html
     let html = `<div id="xx-quiz">`;
     for (let i = 0; i < 3; i++) {
       const obj = words[i];
-      html += `<span id="xx-quiz-${i}" class="${i === correctIndex ? 'correct' : 'incorrect'}">${obj.word}</span>`;
+      html += `<span id="xx-quiz-${i}" class="${obj.word === correctWord ? 'correct' : 'incorrect'}">${obj.word}</span>`;
     }
     html += `</div>`;
 
@@ -271,7 +271,7 @@ function removeElement(id) {
     // Test 3 words
     for (let i = 0; i < 3; i++) {
       const obj = words[i];
-      showQuiz(words, i);
+      showQuiz(words, obj.word);
       await playUrl(obj.testUrl);
       // show quiz here
     }
