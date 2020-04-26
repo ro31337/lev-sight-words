@@ -174,7 +174,7 @@ function removeElement(id) {
     // Test 3 words
     for (let i = 0; i < 3; i++) {
       const obj = words[i];
-      await playUrl(obj.urlTest);
+      await playUrl(obj.testUrl);
       // show quiz here
     }
 
