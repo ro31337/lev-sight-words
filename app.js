@@ -163,6 +163,8 @@ function removeElement(id) {
     playVideo();
   };
 
+  // Debug with:
+  // localStorage.removeItem('xxCnt'); localStorage.removeItem('xxTimestamp');
   const onInterval = async () => {
     console.log('interval');
     const recordedTimestamp = (localStorage.xxTimestamp || Date.now()) * 1;
@@ -171,10 +173,14 @@ function removeElement(id) {
     const diff = Date.now() - recordedTimestamp;
 
     // If last recorded timestamp was a long time ago (more than 5 seconds), then browser was closed,
-    // reset the counter
+    // reset the counter.
     if (diff > 5000) {
       recordedCnt = 0;
-    } else if (recordedCnt % activationInterval === 0) {
+    }
+
+    // Dont run main at the very beginning (recordedCnt is 0)
+    // Run every "activationInterval" seconds.
+    if ((recordedCnt !== 0) && (recordedCnt % activationInterval === 0)) {
       clearInterval(gInterval);
       await main();
       // resume interval
