@@ -9,7 +9,7 @@
 // ==/UserScript==
 
 let gInterval = null;
-const activationInterval = 60 * 15; // in seconds
+const activationInterval = 3; //60 * 15; // in seconds
 
 function addGlobalStyle(css) {
   var head, style;
@@ -56,7 +56,7 @@ function removeElement(id) {
 
   const baseUrl = 'https://raw.githubusercontent.com/ro31337/lev-sight-words/master';
   const introUrl = `${baseUrl}/intro.mp3`;
-  const timeForTestUrl = `${baseUrl}/time-for-test.mp3`;
+  const timeForTestUrl = `${baseUrl}/time-for-test2.mp3`;
   const correctUrl = `${baseUrl}/correct.mp3`;
   const noUrl = `${baseUrl}/no.mp3`;
 
@@ -158,15 +158,29 @@ function removeElement(id) {
     await playUrl(introUrl);
     shuffleArray(words);
 
-    for (let i = 0; i < words.length; i++) {
+    // show
+    // for (let i = 0; i < words.length; i++) {
+    //   const obj = words[i];
+    //   showWord(obj.word);
+    //   await playUrl(obj.url);
+    // }
+
+    // remove word
+    removeElement('xx-word');
+
+    // test with the same sequence for now (to be improved later)
+    await playUrl(timeForTestUrl);
+
+    // Test 3 words
+    for (let i = 0; i < 3; i++) {
       const obj = words[i];
-      showWord(obj.word);
-      await playUrl(obj.url);
+      await playUrl(obj.urlTest);
+      // show quiz here
     }
+
     await playUrl(outroUrl);
 
     // Time for test
-
 
     enableScroll();
     unblockScreen();
