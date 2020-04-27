@@ -9,7 +9,7 @@
 // ==/UserScript==
 
 let gInterval = null;
-const activationInterval = 60 * 15; // in seconds
+const activationInterval = 3;// 60 * 15; // in seconds
 
 function addGlobalStyle(css) {
   var head, style;
@@ -64,6 +64,12 @@ function removeElement(id) {
     { word: 'and', id: 1, url: `${baseUrl}/word-and.mp3`, testUrl: `${baseUrl}/word-and-test.mp3` },
     { word: 'for', id: 2, url: `${baseUrl}/word-for.mp3`, testUrl: `${baseUrl}/word-for-test.mp3` },
     { word: 'the', id: 3, url: `${baseUrl}/word-the.mp3`, testUrl: `${baseUrl}/word-the-test.mp3` },
+    { word: 'a', id: 4, url: `${baseUrl}/word-a.mp3`, testUrl: `${baseUrl}/word-a-test.mp3` },
+    { word: 'in', id: 5, url: `${baseUrl}/word-in.mp3`, testUrl: `${baseUrl}/word-in-test.mp3` },
+    { word: 'is', id: 6, url: `${baseUrl}/word-is.mp3`, testUrl: `${baseUrl}/word-is-test.mp3` },
+    { word: 'of', id: 7, url: `${baseUrl}/word-of.mp3`, testUrl: `${baseUrl}/word-of-test.mp3` },
+    { word: 'to', id: 8, url: `${baseUrl}/word-to.mp3`, testUrl: `${baseUrl}/word-to-test.mp3` },
+    { word: 'you', id: 9, url: `${baseUrl}/word-you.mp3`, testUrl: `${baseUrl}/word-you-test.mp3` },
   ];
   const outroUrl = `${baseUrl}/outro.mp3`;
 
