@@ -236,8 +236,20 @@ function removeElement(id) {
   const showQuiz = async (words, selectedObj) => {
     // Generate quiz html
     let html = `<div id="xx-quiz">`;
-    for (let i = 0; i < 3; i++) {
-      const obj = words[i];
+
+    // Duplicate words array, excluding selected
+    const dup = words.reduce((acc, x) => { if (x.id !== selectedObj.id) { acc.push(x); }; return acc; }, []);
+    shuffleArray(dup);
+
+    // quiz array, 3 elements only, one is selected
+    const arr = [];
+    arr.push(dup.pop());
+    arr.push(dup.pop());
+    arr.push(selectedObj);
+    shuffleArray(arr);
+
+    for (let i = 0; i < arr.length; i++) {
+      const obj = arr[i];
       html += `<span id="xx-quiz-${obj.id}" class="${obj.word === selectedObj.word ? 'correct' : 'incorrect'}">${obj.word}</span>`;
     }
     html += `</div>`;
