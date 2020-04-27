@@ -9,7 +9,7 @@
 // ==/UserScript==
 
 let gInterval = null;
-const activationInterval = 3;// 60 * 15; // in seconds
+const activationInterval = 60 * 15; // in seconds
 
 function addGlobalStyle(css) {
   var head, style;
@@ -267,7 +267,8 @@ function removeElement(id) {
     showWord('✋');
     // await playUrl(introUrl);
 
-    for (let i = 0; i < words.length; i++) {
+    // memorize three words
+    for (let i = 0; i < 3; i++) {
       const obj = words[i];
       showWord(obj.word);
       await playUrl(obj.url);
