@@ -98,6 +98,14 @@ setTimeout(async () => {
       ['of', getWeight('of'), getWord('of')],
       ['to', getWeight('to'), getWord('to')],
       ['you', getWeight('you'), getWord('you')],
+      ['see', getWeight('see'), getWord('see')],
+      ['they', getWeight('they'), getWord('they')],
+      ['can', getWeight('can'), getWord('can')],
+      ['go', getWeight('go'), getWord('go')],
+      ['like', getWeight('like'), getWord('like')],
+      ['we', getWeight('we'), getWord('we')],
+      ['have', getWeight('have'), getWord('have')],
+      ['want', getWeight('want'), getWord('want')],
     ];
 
     console.log('Reinitializing weighed list, new data:');
