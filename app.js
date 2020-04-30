@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Sight Words while youtubing
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.1.1
 // @description  Shows sight words quiz while watching youtube videos
 // @author       Roman Pushkin
 // @match        https://www.youtube.com/*
@@ -61,28 +61,53 @@ setTimeout(async () => {
   const noUrl = `${baseUrl}/no.mp3`;
   const outroUrl = `${baseUrl}/outro.mp3`;
 
-  const ww = (word) => {
+  const getWord = (word) => {
     return { word, id: word, url: `${baseUrl}/word-${word}.mp3`, testUrl: `${baseUrl}/word-${word}-test.mp3` };
   };
 
-  // Little bit reduntant, but it's okay.
-  const data = [
-    ['and', 1, ww('and')],
-    ['for', 1, ww('for')],
-    ['the', 1, ww('the')],
-    ['a', 1, ww('a')],
-    ['in', 1, ww('in')],
-    ['is', 1, ww('is')],
-    ['of', 1, ww('of')],
-    ['to', 1, ww('to')],
-    ['you', 1, ww('you')],
-  ];
+  const getWeight = (word) => {
+    if (!localStorage.xxWeights) return 1;
+    return JSON.parse(localStorage.xxWeights)[word] || 1;
+  };
+
+  // Will adjust weight within the range of 1..10. Note that weight will increase probability
+  // of the element being peeked by WeightedList.
+  // value should be +1 or -1
+  const adjustWeight = (word, value) => {
+    const weights = JSON.parse(localStorage.xxWeights || '{}');
+    const weight = weights[word] || 1;
+    const newWeight = weight + value;
+
+    if (newWeight >= 1 && newWeight <= 10) {
+      weights[word] = newWeight;
+    }
+
+    localStorage.xxWeights = JSON.stringify(weights);
+  };
 
   let wl = null;
-  // Wrap in try-catch block. In case our data is incorrect we'll see exception in console.
-  try {
-    wl = new WeightedList(data);
-  } catch(err) { console.log(err); }
+  const initWl = () => {
+    // Little bit reduntant, but it's okay.
+    const data = [
+      ['and', getWeight('and'), getWord('and')],
+      ['for', getWeight('for'), getWord('for')],
+      ['the', getWeight('the'), getWord('the')],
+      ['a', getWeight('a'), getWord('a')],
+      ['in', getWeight('in'), getWord('in')],
+      ['is', getWeight('is'), getWord('is')],
+      ['of', getWeight('of'), getWord('of')],
+      ['to', getWeight('to'), getWord('to')],
+      ['you', getWeight('you'), getWord('you')],
+    ];
+
+    console.log('Reinitializing weighed list, new data:');
+    console.log(data);
+    // Wrap in try-catch block. In case our data is incorrect we'll see exception in console.
+    try {
+      wl = new WeightedList(data);
+    } catch (err) { console.log(err); }
+  };
+  initWl();
 
   addGlobalStyle(`
     #xx-blocker {
@@ -275,11 +300,28 @@ setTimeout(async () => {
     // Show
     div.innerHTML = html;
 
+    // Track the state of incorrect attempts
+    let incorrectCnt = 0;
+    for (let i = 0; i < arr.length; i++) {
+      const obj = arr[i];
+      if (obj.id !== selectedObj.id) {
+        document.getElementById('xx-quiz-' + obj.id).onclick = () => {
+          incorrectCnt = incorrectCnt + 1;
+        }
+      }
+    }
+
     // Play file
     playUrl(selectedObj.testUrl);
 
     return new Promise(async (resolve) => {
       document.getElementById('xx-quiz-' + selectedObj.id).onclick = async () => {
+        if (incorrectCnt == 0) {
+          adjustWeight(selectedObj.word, -1);
+        } else {
+          adjustWeight(selectedObj.word, +1);
+        }
+        initWl();
         await playUrl(correctUrl);
         resolve();
       };
