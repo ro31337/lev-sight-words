@@ -1,0 +1,156 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Math for kids</title>
+
+  <style>
+    .content {
+      font-family: Arial;
+      background-color: #f0f0f0;
+      color: #333;
+      font-size: 80px;
+
+      display: flex;
+      flex-direction: row;
+      flex-wrap: no-wrap;
+      justify-content: space-evenly;
+    }
+
+    .content .one,
+    .content .two,
+    .content .three {
+      display: flex;
+      flex-direction: column;
+      background-color: #d0d0d0;
+      text-align: center;
+    }
+
+    .content .one .hint,
+    .content .two .hint,
+    .content .three .hint {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      background-color: #e0e0e0;
+    }
+    .content .three .hint {
+      justify-content: flex-start;
+    }
+    .content .three {
+      flex-grow: 1;
+      max-width: 300px;
+    }
+    .content .three .element {
+      width: calc(20% - 10px);
+    }
+
+    .element {
+      width: 20px;
+      height: 20px;
+      border-radius: 20px;
+      transition: left 2s linear, top 2s linear;
+      opacity: 0.01; /* change to 0.01 or to 0.4 */
+      border: solid 4px #f0f0f0;
+    }
+
+    .element.first {
+      background-color: #c08a6c;
+    }
+    .element.second {
+      background-color: #9b5c3f;
+    }
+  </style>
+
+  <script>
+    function f() {
+      const elements = document.querySelectorAll('div[data-shadow-id]');
+      for (var i = 0, len = elements.length; i < len; i++) {
+        const element = elements.item(i);
+        const id = element.getAttribute('data-shadow-id');
+        const placeholder = document.querySelector(`div[data-placeholder-id="${id}"]`);
+
+        const rect = placeholder.getBoundingClientRect();
+        const offsets = {
+          left: rect.left + window.scrollX,
+          top: rect.top + window.scrollY,
+        };
+
+        element.style.cssText = `position: absolute; top: ${offsets.top}px; left: ${offsets.left}px; opacity: 1;`;
+      }
+    };
+
+    function createShadows() {
+      const elements = document.querySelectorAll('div[data-element-id]');
+      const content = document.getElementById('content');
+
+      for (var i = 0, len = elements.length; i < len; i++) {
+        //alert(elements.item(i));
+        const element = elements.item(i);
+        const rect = element.getBoundingClientRect();
+        const offsets = {
+          left: rect.left + window.scrollX,
+          top: rect.top + window.scrollY,
+        };
+
+        const id = element.getAttribute('data-element-id');
+
+        const shadowElement = document.createElement('div');
+        shadowElement.classList = element.classList;
+        shadowElement.style.cssText = `position: absolute; top: ${offsets.top}px; left: ${offsets.left}px; opacity: 1;`;
+        content.appendChild(shadowElement);
+
+        shadowElement.setAttribute('data-shadow-id', id);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      // code...
+      setTimeout(createShadows, 1000);
+    });
+  </script>
+</head>
+
+<body>
+  <div id="content" class="content">
+    <div class="one">
+      <div class="value">5</div>
+      <div class="hint">
+        <div class="element first" data-element-id="1"></div>
+        <div class="element first" data-element-id="2"></div>
+        <div class="element first" data-element-id="3"></div>
+        <div class="element first" data-element-id="4"></div>
+        <div class="element first" data-element-id="5"></div>
+      </div>
+    </div>
+    <div class="plus">+</div>
+    <div class="two">
+      <div class="value">4</div>
+      <div class="hint">
+        <div class="element second" data-element-id="6"></div>
+        <div class="element second" data-element-id="7"></div>
+        <div class="element second" data-element-id="8"></div>
+        <div class="element second" data-element-id="9"></div>
+      </div>
+    </div>
+    <div class="makes">=</div>
+    <div class="three">
+      <div class="value">9</div>
+      <div class="hint">
+        <div class="element" data-placeholder-id="1"></div>
+        <div class="element" data-placeholder-id="2"></div>
+        <div class="element" data-placeholder-id="3"></div>
+        <div class="element" data-placeholder-id="4"></div>
+        <div class="element" data-placeholder-id="5"></div>
+        <div class="element" data-placeholder-id="6"></div>
+        <div class="element" data-placeholder-id="7"></div>
+        <div class="element" data-placeholder-id="8"></div>
+        <div class="element" data-placeholder-id="9"></div>
+      </div>
+    </div>
+  </div>
+  <button onclick="f()">click me</button>
+</body>
+</html>
