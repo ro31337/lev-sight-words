@@ -132,6 +132,24 @@
       const y = getRandomInt(0, 10 - x);
       const sum = x + y;
 
+      // Below we use tricky construction so we have natural sequence 1 2 3 4 5 6 7 8 9 10
+      // when x is 8 and y is 2, and 3 4 5 6 7 8 9 10 1 2 sequence when x is 2 and y is 8.
+      // It makes animations much more easier to understand.
+      //
+      //    > x = 2
+      //      2
+      //    > y = 8
+      //      8
+      //    > Array(sum).fill().map((_, i) => y > x ? ((i + x + 1) % sum === 0 ? 10 : (i + x + 1) % sum) : i + 1).join(' ')
+      //      '3 4 5 6 7 8 9 10 1 2'
+      //    > x = 8
+      //      8
+      //    > y = 2
+      //      2
+      //    > Array(sum).fill().map((_, i) => y > x ? ((i + x + 1) % sum === 0 ? 10 : (i + x + 1) % sum) : i + 1).join(' ')
+      //      '1 2 3 4 5 6 7 8 9 10'
+      //
+
       const html = `
         <div id="content" class="content">
           <div class="one">
@@ -151,7 +169,7 @@
           <div class="three">
             <div class="value">${sum}</div>
             <div class="hint">
-              ${Array(sum).fill().map((_, i) => `<div class="element" data-placeholder-id="${i + 1}"></div>`).join('')}
+              ${Array(sum).fill().map((_, i) => `<div class="element" data-placeholder-id="${y > x ? ((i + x + 1) % sum === 0 ? sum : (i + x + 1) % sum) : i + 1}"></div>`).join('')}
             </div>
           </div>
         </div>
