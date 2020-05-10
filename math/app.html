@@ -80,7 +80,7 @@
       width: 20px;
       height: 20px;
       border-radius: 20px;
-      transition: left 2s linear, top 2s linear;
+      transition: left 1s linear, top 1s linear;
       opacity: 0.01; /* change to 0.01 or to 0.4 */
       border: solid 4px #ffffff;
     }
@@ -185,7 +185,7 @@
   </style>
   <script type="text/javascript" src="weighted-list.js"></script>
   <script>
-    function f() {
+    function moveDotsToTheRight() {
       const elements = document.querySelectorAll('div[data-shadow-id]');
       for (var i = 0, len = elements.length; i < len; i++) {
         const element = elements.item(i);
@@ -304,7 +304,7 @@
             </div>
             <div class="makes">=</div>
             <div class="three">
-              <div class="value">&nbsp;</div>
+              <div id="xx-math-sum-placeholder" class="value" style="opacity: 0.01">${sum}</div>
               <div class="hint ${sum > 5 ? 'more-than-five' : 'less-than-five'}"">
                 ${Array(sum).fill().map((_, i) => `<div class="element" data-placeholder-id="${y > x ? ((i + x + 1) % sum === 0 ? sum : (i + x + 1) % sum) : i + 1}"></div>`).join('')}
               </div>
@@ -312,17 +312,24 @@
           </div>
         </div>
         <div id="xx-math-quiz">
-          ${Array(11).fill().map((_, i) => `<span id="xx-math-quiz-${i}" class="${i === sum ? 'correct' : 'incorrect'}" onclick="f()">${i}</span>`).join('')}
+          ${Array(11).fill().map((_, i) => `<span id="xx-math-quiz-${i}" class="${i === sum ? 'correct' : 'incorrect'}" onclick="moveDotsToTheRight()">${i}</span>`).join('')}
         </div>
       `;
 
+      // Add html to the dom
       const target = document.getElementById('xx-blocker');
-
       const div = document.createElement("div");
       div.id = 'xx-math';
       div.innerHTML = html;
       target.appendChild(div);
 
+      // Set success click handler
+      document.getElementById(`xx-math-quiz-${sum}`).onclick = () => {
+        moveDotsToTheRight();
+        document.getElementById('xx-math-sum-placeholder').style.opacity = 1;
+      }
+
+      // Create shadow dots
       setTimeout(createShadows, 1000);
     }
 
