@@ -7,15 +7,30 @@
   <title>Math for kids</title>
 
   <style>
+    #xx-math {
+      z-index: 99999999;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      display: grid;
+      place-items: center center;
+    }
+
     #xx-math #content-container {
-      display: block;
+      width: 100%;
       max-width: 920px;
-      margin: 0 auto !important;
+    }
+
+    #xx-math #xx-math-quiz {
+      width: 100%;
+      max-width: 1200px;
     }
 
     #xx-blocker .content {
       font-family: Arial;
-      background-color: #f0f0f0;
+      /* background-color: #f0f0f0; */
       color: #333;
       font-size: 80px;
 
@@ -30,7 +45,7 @@
     #xx-blocker .content .three {
       display: flex;
       flex-direction: column;
-      background-color: #d0d0d0;
+      /* background-color: #d0d0d0; */
       text-align: center;
     }
 
@@ -40,9 +55,15 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      background-color: #e0e0e0;
+      /* background-color: #e0e0e0; */
       justify-content: flex-start;
     }
+
+    #xx-blocker .content .hint.less-than-five {
+      justify-content: center;
+      padding-left: 19px;
+    }
+
     #xx-blocker .content .one,
     #xx-blocker .content .two,
     #xx-blocker .content .three {
@@ -61,7 +82,7 @@
       border-radius: 20px;
       transition: left 2s linear, top 2s linear;
       opacity: 0.01; /* change to 0.01 or to 0.4 */
-      border: solid 4px #f0f0f0;
+      border: solid 4px #ffffff;
     }
 
     #xx-blocker .element.first {
@@ -76,7 +97,6 @@
       font-size: 40px;
       font-family: Arial;
       color: #333;
-      position: absolute;
       display: flex;
       flex-direction: row;
       flex-wrap: nowrap;
@@ -271,38 +291,28 @@
           <div id="content" class="content">
             <div class="one">
               <div class="value">${x}</div>
-              <div class="hint">
+              <div class="hint ${x > 5 ? 'more-than-five' : 'less-than-five'}">
                 ${Array(x).fill().map((_, i) => `<div class="element first" data-element-id="${i + 1}"></div>`).join('')}
               </div>
             </div>
             <div class="plus">+</div>
             <div class="two">
               <div class="value">${y}</div>
-              <div class="hint">
+              <div class="hint ${y > 5 ? 'more-than-five' : 'less-than-five'}"">
                 ${Array(y).fill().map((_, i) => `<div class="element second" data-element-id="${x + i + 1}"></div>`).join('')}
               </div>
             </div>
             <div class="makes">=</div>
             <div class="three">
-              <div class="value">${sum}</div>
-              <div class="hint">
+              <div class="value">&nbsp;</div>
+              <div class="hint ${sum > 5 ? 'more-than-five' : 'less-than-five'}"">
                 ${Array(sum).fill().map((_, i) => `<div class="element" data-placeholder-id="${y > x ? ((i + x + 1) % sum === 0 ? sum : (i + x + 1) % sum) : i + 1}"></div>`).join('')}
               </div>
             </div>
           </div>
-          <button onclick="f()">click me</button>
         </div>
         <div id="xx-math-quiz">
-          <span id="xx-quiz-1" class="incorrect">1</span>
-          <span id="xx-quiz-1" class="incorrect">2</span>
-          <span id="xx-quiz-1" class="incorrect">3</span>
-          <span id="xx-quiz-1" class="incorrect">4</span>
-          <span id="xx-quiz-1" class="correct">5</span>
-          <span id="xx-quiz-1" class="incorrect">6</span>
-          <span id="xx-quiz-1" class="incorrect">7</span>
-          <span id="xx-quiz-1" class="incorrect">8</span>
-          <span id="xx-quiz-1" class="incorrect">9</span>
-          <span id="xx-quiz-1" class="incorrect">10</span>
+          ${Array(11).fill().map((_, i) => `<span id="xx-math-quiz-${i}" class="${i === sum ? 'correct' : 'incorrect'}" onclick="f()">${i}</span>`).join('')}
         </div>
       `;
 
