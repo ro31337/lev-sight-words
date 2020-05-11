@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Sight Words while youtubing
+// @name         Sight Words + math while youtubing
 // @namespace    http://tampermonkey.net/
-// @version      0.1.1
+// @version      0.2
 // @description  Shows sight words quiz while watching youtube videos
 // @author       Roman Pushkin
 // @match        https://www.youtube.com/*
@@ -9,7 +9,7 @@
 // ==/UserScript==
 
 let gInterval = null;
-const activationInterval = 60 * 15; // in seconds
+const activationInterval = 3;//60 * 15; // in seconds
 
 function addGlobalStyle(css) {
   var head, style;
@@ -40,6 +40,19 @@ function shuffleArray(array) {
   }
 
   return array;
+}
+
+/**
+ * Returns a random integer between min (inclusive) and max (inclusive).
+ * The value is no lower than min (or the next integer greater than min
+ * if min isn't an integer) and no greater than max (or the next integer
+ * lower than max if max isn't an integer).
+ * Using Math.round() will give you a non-uniform distribution!
+ */
+const getRandomInt = (min, max) => {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function sleep(ms) {
@@ -222,7 +235,139 @@ setTimeout(async () => {
       overflow: hidden;
     }
 
+    #xx-math {
+      z-index: 99999999;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      display: grid;
+      place-items: center center;
+    }
 
+    #xx-math #xx-math-content-container {
+      width: 100%;
+      max-width: 920px;
+    }
+
+    #xx-math #xx-math-quiz {
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    #xx-math #xx-math-content {
+      font-family: Arial;
+      /* background-color: #f0f0f0; */
+      color: #333;
+      font-size: 80px;
+
+      display: flex;
+      flex-direction: row;
+      flex-wrap: no-wrap;
+      justify-content: space-evenly;
+    }
+
+    #xx-math #xx-math-content .one,
+    #xx-math #xx-math-content .two,
+    #xx-math #xx-math-content .three {
+      display: flex;
+      flex-direction: column;
+      /* background-color: #d0d0d0; */
+      text-align: center;
+    }
+
+    #xx-math #xx-math-content .one .hint,
+    #xx-math #xx-math-content .two .hint,
+    #xx-math #xx-math-content .three .hint {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      /* background-color: #e0e0e0; */
+      justify-content: flex-start;
+    }
+
+    #xx-math #xx-math-content .hint.less-than-five {
+      justify-content: center;
+      padding-left: 19px;
+    }
+
+    #xx-math #xx-math-content .one,
+    #xx-math #xx-math-content .two,
+    #xx-math #xx-math-content .three {
+      flex-grow: 1;
+      max-width: 300px;
+    }
+    #xx-math #xx-math-content .one .element,
+    #xx-math #xx-math-content .two .element,
+    #xx-math #xx-math-content .three .element {
+      width: calc(20% - 10px);
+    }
+
+    #xx-math .element {
+      width: 20px;
+      height: 20px;
+      border-radius: 20px;
+      transition: left 1s linear, top 1s linear;
+      opacity: 0.01; /* change to 0.01 or to 0.4 */
+      border: solid 4px #f0f0f0;
+    }
+
+    #xx-math .element.first {
+      background-color: #c08a6c;
+    }
+    #xx-math .element.second {
+      background-color: #9b5c3f;
+    }
+
+    #xx-math-quiz {
+      width: 100%;
+      font-size: 40px;
+      font-family: Arial;
+      color: #333;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-evenly;
+    }
+
+    #xx-math-quiz {
+      animation: makeVisible 0s 1s forwards;
+      visibility: hidden;
+    }
+
+    #xx-math-quiz span {
+      background-color: white;
+      padding-left: 30px;
+      padding-right: 30px;
+      cursor: pointer;
+      border: solid 2px #999;
+      border-radius: 15px;
+      display: block;
+    }
+
+    #xx-math-quiz span.correct:active {
+      background-color: #E0FFDD;
+    }
+
+    #xx-math-quiz span.correct:not(:active) {
+      transition: background-color 3000ms step-end;
+    }
+
+    #xx-math-quiz span.incorrect:not(:active) {
+      /* now keep red background for 1s */
+      transition: background-color 1000ms step-end;
+      -webkit-animation-name: wobble;
+      animation-name: wobble;
+      -webkit-animation-duration:          0.5s;
+      -webkit-animation-iteration-count:   1;
+      -webkit-animation-timing-function:   linear;
+      -webkit-transform-origin:            50% 100%;
+    }
+
+    #xx-math-quiz span.incorrect:active {
+      background-color: red;
+    }
   `);
 
   const blockScreen = () => {
@@ -233,8 +378,9 @@ setTimeout(async () => {
 
   const unblockScreen = () => {
     removeElement('xx-word');
-    removeElement('xx-blocker');
+    removeElement('xx-math');
     removeElement('xx-quiz');
+    removeElement('xx-blocker');
   };
 
   const disableScroll = () => {
@@ -365,6 +511,178 @@ setTimeout(async () => {
     removeElement('xx-quiz');
   };
 
+  const mathQuiz = async() => {
+    const moveDotsToTheRight = () => {
+      const elements = document.querySelectorAll('div[data-shadow-id]');
+      for (var i = 0, len = elements.length; i < len; i++) {
+        const element = elements.item(i);
+        const id = element.getAttribute('data-shadow-id');
+        const placeholder = document.querySelector(`div[data-placeholder-id="${id}"]`);
+
+        const rect = placeholder.getBoundingClientRect();
+        const offsets = {
+          left: rect.left + window.scrollX,
+          top: rect.top + window.scrollY,
+        };
+
+        element.style.cssText = `position: absolute; top: ${offsets.top}px; left: ${offsets.left}px; opacity: 1;`;
+      }
+    };
+
+    const createShadows = () => {
+      const elements = document.querySelectorAll('div[data-element-id]');
+      const content = document.getElementById('xx-math-content');
+
+      for (var i = 0, len = elements.length; i < len; i++) {
+        //alert(elements.item(i));
+        const element = elements.item(i);
+        const rect = element.getBoundingClientRect();
+        const offsets = {
+          left: rect.left + window.scrollX,
+          top: rect.top + window.scrollY,
+        };
+
+        const id = element.getAttribute('data-element-id');
+
+        const shadowElement = document.createElement('div');
+        shadowElement.classList = element.classList;
+        shadowElement.style.cssText = `position: absolute; top: ${offsets.top}px; left: ${offsets.left}px; opacity: 1;`;
+        content.appendChild(shadowElement);
+
+        shadowElement.setAttribute('data-shadow-id', id);
+      }
+    };
+
+    /**
+     * Returns a random integer between min (inclusive) and max (inclusive).
+     * The value is no lower than min (or the next integer greater than min
+     * if min isn't an integer) and no greater than max (or the next integer
+     * lower than max if max isn't an integer).
+     * Using Math.round() will give you a non-uniform distribution!
+     */
+    const getRandomInt = (min, max) => {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    const numbersAndWeights = [
+      [0, 1],
+      [1, 2],
+      [2, 3],
+      [3, 3],
+      [4, 3],
+      [5, 3],
+      [6, 3],
+      [7, 3],
+      [8, 2],
+      [9, 1],
+    ];
+
+    const numbersWl = new WeightedList(numbersAndWeights);
+
+    const initMath = () => {
+      // Get numbers based on their weights
+      let x = 999;
+      let y = 999;
+
+      while (x + y > 10) {
+        x = numbersWl.peek() * 1;
+        y = numbersWl.peek() * 1;
+      }
+
+      const sum = x + y;
+
+      // Below we use tricky construction so we have natural sequence 1 2 3 4 5 6 7 8 9 10
+      // when x is 8 and y is 2, and 3 4 5 6 7 8 9 10 1 2 sequence when x is 2 and y is 8.
+      // It makes animations much more easier to understand.
+      //
+      //    > sum = 10
+      //      10
+      //    > x = 2
+      //      2
+      //    > y = 8
+      //      8
+      //    > Array(sum).fill().map((_, i) => y > x ? ((i + x + 1) % sum === 0 ? sum : (i + x + 1) % sum) : i + 1).join(' ')
+      //      '3 4 5 6 7 8 9 10 1 2'
+      //    > x = 8
+      //      8
+      //    > y = 2
+      //      2
+      //    > Array(sum).fill().map((_, i) => y > x ? ((i + x + 1) % sum === 0 ? sum : (i + x + 1) % sum) : i + 1).join(' ')
+      //      '1 2 3 4 5 6 7 8 9 10'
+      //
+
+      const html = `
+        <div id="xx-math-content-container">
+          <div id="xx-math-content">
+            <div class="one">
+              <div class="value">${x}</div>
+              <div class="hint ${x > 5 ? 'more-than-five' : 'less-than-five'}">
+                ${Array(x).fill().map((_, i) => `<div class="element first" data-element-id="${i + 1}"></div>`).join('')}
+              </div>
+            </div>
+            <div class="plus">+</div>
+            <div class="two">
+              <div class="value">${y}</div>
+              <div class="hint ${y > 5 ? 'more-than-five' : 'less-than-five'}"">
+                ${Array(y).fill().map((_, i) => `<div class="element second" data-element-id="${x + i + 1}"></div>`).join('')}
+              </div>
+            </div>
+            <div class="makes">=</div>
+            <div class="three">
+              <div id="xx-math-sum-placeholder" class="value" style="opacity: 0.01">${sum}</div>
+              <div class="hint ${sum > 5 ? 'more-than-five' : 'less-than-five'}"">
+                ${Array(sum).fill().map((_, i) => `<div class="element" data-placeholder-id="${y > x ? ((i + x + 1) % sum === 0 ? sum : (i + x + 1) % sum) : i + 1}"></div>`).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="xx-math-quiz">
+          ${Array(11).fill().map((_, i) => `<span id="xx-math-quiz-${i}" class="${i === sum ? 'correct' : 'incorrect'}">${i}</span>`).join('')}
+        </div>
+      `;
+
+      // Add html to the dom
+      const target = document.getElementById('xx-blocker');
+      const div = document.createElement("div");
+      div.id = 'xx-math';
+      div.innerHTML = html;
+      target.appendChild(div);
+
+      // Example of setting success click handler:
+      // Commented out for compatibility with TamperMonkey script
+      // document.getElementById(`xx-math-quiz-${sum}`).onclick = () => {
+      //   moveDotsToTheRight();
+      //   document.getElementById('xx-math-sum-placeholder').style.opacity = 1;
+      // }
+
+      for (let i = 0; i <= 10; i++) {
+        document.getElementById(`xx-math-quiz-${i}`).onclick = () => { moveDotsToTheRight() };
+      }
+
+      // Create shadow dots
+      setTimeout(createShadows, 1000);
+
+      return sum;
+    }
+
+    const correctAnswer = initMath();
+
+    // Yes, wait 300ms so xx-math and all other elements are present
+    await sleep(300);
+
+    return new Promise(async (resolve) => {
+      // Set success click handler
+      document.getElementById(`xx-math-quiz-${correctAnswer}`).onclick = async () => {
+        moveDotsToTheRight();
+        document.getElementById('xx-math-sum-placeholder').style.opacity = 1;
+        await sleep(1500);
+        resolve();
+      }
+    });
+  }
+
   const main = async () => {
     try {
       pauseVideo();
@@ -372,10 +690,13 @@ setTimeout(async () => {
       blockScreen();
       //await playUrl(introUrl);
 
-      if (Date.now() % 2 === 0) {
+      const rand = 3;//getRandomInt(1, 3);
+      if (rand === 1) {
         await memorize();
-      } else {
+      } else if (rand === 2) {
         await quiz();
+      } else {
+        await mathQuiz();
       }
 
       enableScroll();

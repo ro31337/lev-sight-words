@@ -7,6 +7,10 @@
   <title>Math for kids</title>
 
   <style>
+    body {
+      background-color: #f0f0f0;
+    }
+
     #xx-math {
       z-index: 99999999;
       top: 0;
@@ -18,7 +22,7 @@
       place-items: center center;
     }
 
-    #xx-math #content-container {
+    #xx-math #xx-math-content-container {
       width: 100%;
       max-width: 920px;
     }
@@ -28,7 +32,7 @@
       max-width: 1200px;
     }
 
-    #xx-blocker .content {
+    #xx-math #xx-math-content {
       font-family: Arial;
       /* background-color: #f0f0f0; */
       color: #333;
@@ -40,18 +44,18 @@
       justify-content: space-evenly;
     }
 
-    #xx-blocker .content .one,
-    #xx-blocker .content .two,
-    #xx-blocker .content .three {
+    #xx-math #xx-math-content .one,
+    #xx-math #xx-math-content .two,
+    #xx-math #xx-math-content .three {
       display: flex;
       flex-direction: column;
       /* background-color: #d0d0d0; */
       text-align: center;
     }
 
-    #xx-blocker .content .one .hint,
-    #xx-blocker .content .two .hint,
-    #xx-blocker .content .three .hint {
+    #xx-math #xx-math-content .one .hint,
+    #xx-math #xx-math-content .two .hint,
+    #xx-math #xx-math-content .three .hint {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
@@ -59,36 +63,36 @@
       justify-content: flex-start;
     }
 
-    #xx-blocker .content .hint.less-than-five {
+    #xx-math #xx-math-content .hint.less-than-five {
       justify-content: center;
       padding-left: 19px;
     }
 
-    #xx-blocker .content .one,
-    #xx-blocker .content .two,
-    #xx-blocker .content .three {
+    #xx-math #xx-math-content .one,
+    #xx-math #xx-math-content .two,
+    #xx-math #xx-math-content .three {
       flex-grow: 1;
       max-width: 300px;
     }
-    #xx-blocker .content .one .element,
-    #xx-blocker .content .two .element,
-    #xx-blocker .content .three .element {
+    #xx-math #xx-math-content .one .element,
+    #xx-math #xx-math-content .two .element,
+    #xx-math #xx-math-content .three .element {
       width: calc(20% - 10px);
     }
 
-    #xx-blocker .element {
+    #xx-math .element {
       width: 20px;
       height: 20px;
       border-radius: 20px;
       transition: left 1s linear, top 1s linear;
       opacity: 0.01; /* change to 0.01 or to 0.4 */
-      border: solid 4px #ffffff;
+      border: solid 4px #f0f0f0;
     }
 
-    #xx-blocker .element.first {
+    #xx-math .element.first {
       background-color: #c08a6c;
     }
-    #xx-blocker .element.second {
+    #xx-math .element.second {
       background-color: #9b5c3f;
     }
 
@@ -106,10 +110,6 @@
     #xx-math-quiz {
       animation: makeVisible 0s 1s forwards;
       visibility: hidden;
-    }
-
-    @keyframes makeVisible {
-      to   { visibility: visible; }
     }
 
     #xx-math-quiz span {
@@ -143,6 +143,12 @@
 
     #xx-math-quiz span.incorrect:active {
       background-color: red;
+    }
+
+    /* Styles below are shared */
+
+    @keyframes makeVisible {
+      to   { visibility: visible; }
     }
 
     @-webkit-keyframes wobble {
@@ -185,7 +191,7 @@
   </style>
   <script type="text/javascript" src="weighted-list.js"></script>
   <script>
-    function moveDotsToTheRight() {
+    const moveDotsToTheRight = () => {
       const elements = document.querySelectorAll('div[data-shadow-id]');
       for (var i = 0, len = elements.length; i < len; i++) {
         const element = elements.item(i);
@@ -202,9 +208,9 @@
       }
     };
 
-    function createShadows() {
+    const createShadows = () => {
       const elements = document.querySelectorAll('div[data-element-id]');
-      const content = document.getElementById('content');
+      const content = document.getElementById('xx-math-content');
 
       for (var i = 0, len = elements.length; i < len; i++) {
         //alert(elements.item(i));
@@ -224,7 +230,7 @@
 
         shadowElement.setAttribute('data-shadow-id', id);
       }
-    }
+    };
 
     /**
      * Returns a random integer between min (inclusive) and max (inclusive).
@@ -239,7 +245,7 @@
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    var numbersAndWeights = [
+    const numbersAndWeights = [
       [0, 1],
       [1, 2],
       [2, 3],
@@ -252,7 +258,7 @@
       [9, 1],
     ];
 
-    var numbersWl = new WeightedList(numbersAndWeights);
+    const numbersWl = new WeightedList(numbersAndWeights);
 
     const initMath = () => {
       // Get numbers based on their weights
@@ -287,8 +293,8 @@
       //
 
       const html = `
-        <div id="content-container">
-          <div id="content" class="content">
+        <div id="xx-math-content-container">
+          <div id="xx-math-content">
             <div class="one">
               <div class="value">${x}</div>
               <div class="hint ${x > 5 ? 'more-than-five' : 'less-than-five'}">
@@ -312,7 +318,7 @@
           </div>
         </div>
         <div id="xx-math-quiz">
-          ${Array(11).fill().map((_, i) => `<span id="xx-math-quiz-${i}" class="${i === sum ? 'correct' : 'incorrect'}" onclick="moveDotsToTheRight()">${i}</span>`).join('')}
+          ${Array(11).fill().map((_, i) => `<span id="xx-math-quiz-${i}" class="${i === sum ? 'correct' : 'incorrect'}">${i}</span>`).join('')}
         </div>
       `;
 
@@ -323,14 +329,21 @@
       div.innerHTML = html;
       target.appendChild(div);
 
-      // Set success click handler
-      document.getElementById(`xx-math-quiz-${sum}`).onclick = () => {
-        moveDotsToTheRight();
-        document.getElementById('xx-math-sum-placeholder').style.opacity = 1;
+      // Example of setting success click handler:
+      // Commented out for compatibility with TamperMonkey script
+      // document.getElementById(`xx-math-quiz-${sum}`).onclick = () => {
+      //   moveDotsToTheRight();
+      //   document.getElementById('xx-math-sum-placeholder').style.opacity = 1;
+      // }
+
+      for (let i = 0; i <= 10; i++) {
+        document.getElementById(`xx-math-quiz-${i}`).onclick = () => { moveDotsToTheRight() };
       }
 
       // Create shadow dots
       setTimeout(createShadows, 1000);
+
+      return sum;
     }
 
     document.addEventListener("DOMContentLoaded", function () {
