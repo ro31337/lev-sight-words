@@ -1,15 +1,15 @@
 // ==UserScript==
 // @name         Sight Words + math while youtubing
 // @namespace    http://tampermonkey.net/
-// @version      0.2
-// @description  Shows sight words quiz while watching youtube videos
+// @version      0.2.0
+// @description  Shows math or sight words quiz while watching youtube videos
 // @author       Roman Pushkin
 // @match        https://www.youtube.com/*
 // @grant        none
 // ==/UserScript==
 
 let gInterval = null;
-const activationInterval = 3;//60 * 15; // in seconds
+const activationInterval = 60 * 15; // in seconds
 
 function addGlobalStyle(css) {
   var head, style;
@@ -677,7 +677,7 @@ setTimeout(async () => {
       document.getElementById(`xx-math-quiz-${correctAnswer}`).onclick = async () => {
         moveDotsToTheRight();
         document.getElementById('xx-math-sum-placeholder').style.opacity = 1;
-        // await playUrl(correctUrl);
+        await playUrl(correctUrl);
         resolve();
       }
     });
@@ -706,7 +706,7 @@ setTimeout(async () => {
       blockScreen();
       //await playUrl(introUrl);
 
-      const rand = 3;//getRandomInt(1, 3);
+      const rand = getRandomInt(1, 3);
       if (rand === 1) {
         await memorize();
       } else if (rand === 2) {
