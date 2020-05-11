@@ -73,6 +73,8 @@ setTimeout(async () => {
   const correctUrl = `${baseUrl}/correct.mp3`;
   const noUrl = `${baseUrl}/no.mp3`;
   const outroUrl = `${baseUrl}/outro.mp3`;
+  const oneMoreTimeUrl = `${baseUrl}/one-more-time2.mp3`;
+  const lastTimeUrl = `${baseUrl}/last-time2.mp3`;
 
   const getWord = (word) => {
     return { word, id: word, url: `${baseUrl}/word-${word}.mp3`, testUrl: `${baseUrl}/word-${word}-test.mp3` };
@@ -511,7 +513,8 @@ setTimeout(async () => {
     removeElement('xx-quiz');
   };
 
-  const mathQuiz = async() => {
+  // Shows single math quiz
+  const singleMathQuiz = async () => {
     const moveDotsToTheRight = () => {
       const elements = document.querySelectorAll('div[data-shadow-id]');
       for (var i = 0, len = elements.length; i < len; i++) {
@@ -669,18 +672,32 @@ setTimeout(async () => {
 
     const correctAnswer = initMath();
 
-    await playUrl(timeForTestUrl);
-
     return new Promise(async (resolve) => {
       // Set success click handler
       document.getElementById(`xx-math-quiz-${correctAnswer}`).onclick = async () => {
         moveDotsToTheRight();
         document.getElementById('xx-math-sum-placeholder').style.opacity = 1;
-        await playUrl(correctUrl);
+        // await playUrl(correctUrl);
         resolve();
       }
     });
   }
+
+  const tripleMathQuiz = async () => {
+    // Play without await - it takes about a second to render the screen anyway
+    playUrl(timeForTestUrl);
+
+    await singleMathQuiz();
+    removeElement('xx-math');
+
+    playUrl(oneMoreTimeUrl);
+    await singleMathQuiz();
+    removeElement('xx-math');
+
+    playUrl(lastTimeUrl);
+    await singleMathQuiz();
+    removeElement('xx-math');
+  };
 
   const main = async () => {
     try {
@@ -695,7 +712,7 @@ setTimeout(async () => {
       } else if (rand === 2) {
         await quiz();
       } else {
-        await mathQuiz();
+        await tripleMathQuiz();
       }
 
       enableScroll();
