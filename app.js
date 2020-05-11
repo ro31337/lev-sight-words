@@ -669,15 +669,14 @@ setTimeout(async () => {
 
     const correctAnswer = initMath();
 
-    // Yes, wait 300ms so xx-math and all other elements are present
-    await sleep(300);
+    await playUrl(timeForTestUrl);
 
     return new Promise(async (resolve) => {
       // Set success click handler
       document.getElementById(`xx-math-quiz-${correctAnswer}`).onclick = async () => {
         moveDotsToTheRight();
         document.getElementById('xx-math-sum-placeholder').style.opacity = 1;
-        await sleep(1500);
+        await playUrl(correctUrl);
         resolve();
       }
     });
