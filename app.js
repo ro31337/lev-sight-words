@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Sight Words + math while youtubing
 // @namespace    http://tampermonkey.net/
-// @version      0.2.0
+// @version      0.2.1
 // @description  Shows math or sight words quiz while watching youtube videos
 // @author       Roman Pushkin
 // @match        https://www.youtube.com/*
@@ -73,16 +73,16 @@ setTimeout(async () => {
   const correctUrl = `${baseUrl}/correct.mp3`;
   const noUrl = `${baseUrl}/no.mp3`;
   const outroUrl = `${baseUrl}/outro.mp3`;
-  const oneMoreTimeUrl = `${baseUrl}/one-more-time2.mp3`;
-  const lastTimeUrl = `${baseUrl}/last-time2.mp3`;
+  const oneMoreTimeUrl = `${baseUrl}/one-more-time.mp3`;
+  const lastTimeUrl = `${baseUrl}/last-time.mp3`;
 
   const getWord = (word) => {
     return { word, id: word, url: `${baseUrl}/word-${word}.mp3`, testUrl: `${baseUrl}/word-${word}-test.mp3` };
   };
 
-  const getWeight = (word) => {
-    if (!localStorage.xxWeights) return 1;
-    return JSON.parse(localStorage.xxWeights)[word] || 1;
+  const getWeight = (word, defaultWeight) => {
+    if (!localStorage.xxWeights) return (defaultWeight || 1);
+    return JSON.parse(localStorage.xxWeights)[word] || (defaultWeight || 1);
   };
 
   // Will adjust weight within the range of 1..10. Note that weight will increase probability
@@ -121,6 +121,16 @@ setTimeout(async () => {
       ['we', getWeight('we'), getWord('we')],
       ['have', getWeight('have'), getWord('have')],
       ['want', getWeight('want'), getWord('want')],
+      ['who', getWeight('who', 5), getWord('who')],
+      ['look', getWeight('look', 5), getWord('look')],
+      ['this', getWeight('this', 5), getWord('this')],
+      ['what', getWeight('what', 5), getWord('what')],
+      ['me', getWeight('me', 5), getWord('me')],
+      ['are', getWeight('are', 5), getWord('are')],
+      ['he', getWeight('he', 5), getWord('he')],
+      ['she', getWeight('she', 5), getWord('she')],
+      ['too', getWeight('too', 5), getWord('too')],
+      ['play', getWeight('play', 5), getWord('play')],
     ];
 
     console.log('Reinitializing weighed list, new data:');
