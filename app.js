@@ -9,7 +9,7 @@
 // ==/UserScript==
 
 let gInterval = null;
-const activationInterval = 60 * 15; // in seconds
+const activationInterval = 4;//60 * 15; // in seconds
 
 function addGlobalStyle(css) {
   var head, style;
@@ -160,7 +160,7 @@ setTimeout(async () => {
       width: 100%;
       height: 100%;
       font-size: 90px;
-      font-family: Arial;
+      font-family: SF Cartoonist Hand, Cartoonist Hand, Comic Sans, Arial;
       color: #333;
       position: absolute;
       display: grid;
@@ -269,7 +269,7 @@ setTimeout(async () => {
     }
 
     #xx-math #xx-math-content {
-      font-family: Arial;
+      font-family: SF Cartoonist Hand, Cartoonist Hand, Comic Sans, Arial;
       /* background-color: #f0f0f0; */
       color: #333;
       font-size: 80px;
@@ -335,7 +335,7 @@ setTimeout(async () => {
     #xx-math-quiz {
       width: 100%;
       font-size: 40px;
-      font-family: Arial;
+      font-family: SF Cartoonist Hand, Cartoonist Hand, Comic Sans, Arial;
       color: #333;
       display: flex;
       flex-direction: row;
@@ -716,10 +716,10 @@ setTimeout(async () => {
       blockScreen();
       //await playUrl(introUrl);
 
-      const rand = getRandomInt(1, 3);
-      if (rand === 1) {
+      const rand = getRandomInt(1, 10);
+      if (rand >= 1 && rand <= 3) {
         await memorize();
-      } else if (rand === 2) {
+      } else if (rand >= 4 && rand <= 7) {
         await quiz();
       } else {
         await tripleMathQuiz();
