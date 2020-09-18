@@ -1,11 +1,10 @@
 // ==UserScript==
 // @name         Sight Words + math while youtubing
 // @namespace    http://tampermonkey.net/
-// @version      0.2.2
+// @version      0.2.3
 // @description  Shows math or sight words quiz while watching youtube videos
 // @author       Roman Pushkin
 // @match        https://www.youtube.com/*
-// @match        https://kino.pub/*
 // @grant        none
 // ==/UserScript==
 
@@ -144,7 +143,7 @@ setTimeout(async () => {
   initWl();
 
   addGlobalStyle(`
-  #xx-blocker {
+    #xx-blocker {
       position: absolute;
       top: 0;
       left: 0;
@@ -163,7 +162,7 @@ setTimeout(async () => {
       font-size: 90px;
       font-family: Arial;
       color: #333;
-      position: fixed;
+      position: absolute;
       display: grid;
       place-items: center center;
     }
@@ -254,7 +253,7 @@ setTimeout(async () => {
       left: 0;
       width: 100%;
       height: 100%;
-      position: fixed;
+      position: absolute;
       display: grid;
       place-items: center center;
     }
@@ -281,18 +280,18 @@ setTimeout(async () => {
       justify-content: space-evenly;
     }
 
-    #xx-math #xx-math-content .xx-one,
-    #xx-math #xx-math-content .xx-two,
-    #xx-math #xx-math-content .xx-three {
+    #xx-math #xx-math-content .one,
+    #xx-math #xx-math-content .two,
+    #xx-math #xx-math-content .three {
       display: flex;
       flex-direction: column;
       /* background-color: #d0d0d0; */
       text-align: center;
     }
 
-    #xx-math #xx-math-content .xx-one .xx-hint,
-    #xx-math #xx-math-content .xx-two .xx-hint,
-    #xx-math #xx-math-content .xx-three .xx-hint {
+    #xx-math #xx-math-content .one .hint,
+    #xx-math #xx-math-content .two .hint,
+    #xx-math #xx-math-content .three .hint {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
@@ -300,36 +299,36 @@ setTimeout(async () => {
       justify-content: flex-start;
     }
 
-    #xx-math #xx-math-content .xx-hint.less-than-five {
+    #xx-math #xx-math-content .hint.less-than-five {
       justify-content: center;
       padding-left: 19px;
     }
 
-    #xx-math #xx-math-content .xx-one,
-    #xx-math #xx-math-content .xx-two,
-    #xx-math #xx-math-content .xx-three {
+    #xx-math #xx-math-content .one,
+    #xx-math #xx-math-content .two,
+    #xx-math #xx-math-content .three {
       flex-grow: 1;
       max-width: 300px;
     }
-    #xx-math #xx-math-content .xx-one .xx-element,
-    #xx-math #xx-math-content .xx-two .xx-element,
-    #xx-math #xx-math-content .xx-three .xx-element {
-      width: calc(20% - 1px);
+    #xx-math #xx-math-content .one .element,
+    #xx-math #xx-math-content .two .element,
+    #xx-math #xx-math-content .three .element {
+      width: calc(20% - 10px);
     }
 
-    #xx-math .xx-element {
-      width: 35px;
-      height: 35px;
-      border-radius: 35px;
+    #xx-math .element {
+      width: 20px;
+      height: 20px;
+      border-radius: 20px;
       transition: left 1s linear, top 1s linear;
-      opacity: 0.01; /* DEBUG: change to 0.01 or to 0.8 */
+      opacity: 0.01; /* change to 0.01 or to 0.4 */
       border: solid 4px #f0f0f0;
     }
 
-    #xx-math .xx-element.xx-first {
+    #xx-math .element.first {
       background-color: #c08a6c;
     }
-    #xx-math .xx-element.xx-second {
+    #xx-math .element.second {
       background-color: #9b5c3f;
     }
 
@@ -404,52 +403,16 @@ setTimeout(async () => {
     document.body.classList.remove('disable-scroll');
   };
 
-  // TODO: refactor and extract 3 functions (pause, play, getState) into strategy pattern
-
   const pauseVideo = () => {
-    // Youtube pause
     try {
       document.getElementById('movie_player').pauseVideo();
-    } catch (err) { /* console.log(err);*/ }
-
-    // JwPlayer pause
-    try {
-      jwplayer().pause();
-      jwplayer().setFullscreen(false);
-    } catch (err) { /* console.log(err);*/ }
+    } catch (err) { console.log(err);}
   };
 
   const playVideo = () => {
-    // Youtube play
     try {
       document.getElementById('movie_player').playVideo();
-    } catch (err) { /* console.log(err);*/ }
-
-    // JwPlayer play
-    try {
-      jwplayer().play();
-      jwplayer().setFullscreen(true); // TODO: remember and restore this state
-    } catch (err) { /* console.log(err);*/ }
-  };
-
-  const getVideoState = () => {
-    let youTubeState = null;
-    let jwPlayerState = null;
-
-    try {
-      // 1 means "playing" in youtube, see see https://developers.google.com/youtube/iframe_api_reference
-      youTubeState = document.getElementById('movie_player').getPlayerState()
-    } catch (err) { /* console.log(err);*/ }
-
-    try {
-      jwPlayerState = jwplayer().getState();
-    } catch (err) { /* console.log(err);*/ }
-
-    if(youTubeState === 1 || jwPlayerState === 'playing') {
-      return 'playing';
-    } else {
-      return 'paused';
-    }
+    } catch (err) { console.log(err); }
   };
 
   const playUrl = (url) => {
@@ -571,8 +534,8 @@ setTimeout(async () => {
 
         const rect = placeholder.getBoundingClientRect();
         const offsets = {
-          left: rect.left, // + window.scrollX,
-          top: rect.top, // + window.scrollY,
+          left: rect.left + window.scrollX,
+          top: rect.top + window.scrollY,
         };
 
         element.style.cssText = `position: absolute; top: ${offsets.top}px; left: ${offsets.left}px; opacity: 1;`;
@@ -588,8 +551,8 @@ setTimeout(async () => {
         const element = elements.item(i);
         const rect = element.getBoundingClientRect();
         const offsets = {
-          left: rect.left, // + window.scrollX,
-          top: rect.top, // + window.scrollY,
+          left: rect.left + window.scrollX,
+          top: rect.top + window.scrollY,
         };
 
         const id = element.getAttribute('data-element-id');
@@ -666,24 +629,24 @@ setTimeout(async () => {
       const html = `
         <div id="xx-math-content-container">
           <div id="xx-math-content">
-            <div class="xx-one">
-              <div class="xx-value">${x}</div>
-              <div class="xx-hint ${x > 5 ? 'more-than-five' : 'less-than-five'}">
-                ${Array(x).fill().map((_, i) => `<div class="xx-element xx-first" data-element-id="${i + 1}"></div>`).join('')}
+            <div class="one">
+              <div class="value">${x}</div>
+              <div class="hint ${x > 5 ? 'more-than-five' : 'less-than-five'}">
+                ${Array(x).fill().map((_, i) => `<div class="element first" data-element-id="${i + 1}"></div>`).join('')}
               </div>
             </div>
-            <div class="xx-plus">+</div>
-            <div class="xx-two">
-              <div class="xx-value">${y}</div>
-              <div class="xx-hint ${y > 5 ? 'more-than-five' : 'less-than-five'}"">
-                ${Array(y).fill().map((_, i) => `<div class="xx-element xx-second" data-element-id="${x + i + 1}"></div>`).join('')}
+            <div class="plus">+</div>
+            <div class="two">
+              <div class="value">${y}</div>
+              <div class="hint ${y > 5 ? 'more-than-five' : 'less-than-five'}"">
+                ${Array(y).fill().map((_, i) => `<div class="element second" data-element-id="${x + i + 1}"></div>`).join('')}
               </div>
             </div>
-            <div class="xx-makes">=</div>
-            <div class="xx-three">
-              <div id="xx-math-sum-placeholder" class="xx-value" style="opacity: 0.01">${sum}</div>
-              <div class="xx-hint ${sum > 5 ? 'more-than-five' : 'less-than-five'}"">
-                ${Array(sum).fill().map((_, i) => `<div class="xx-element" data-placeholder-id="${y > x ? ((i + x + 1) % sum === 0 ? sum : (i + x + 1) % sum) : i + 1}"></div>`).join('')}
+            <div class="makes">=</div>
+            <div class="three">
+              <div id="xx-math-sum-placeholder" class="value" style="opacity: 0.01">${sum}</div>
+              <div class="hint ${sum > 5 ? 'more-than-five' : 'less-than-five'}"">
+                ${Array(sum).fill().map((_, i) => `<div class="element" data-placeholder-id="${y > x ? ((i + x + 1) % sum === 0 ? sum : (i + x + 1) % sum) : i + 1}"></div>`).join('')}
               </div>
             </div>
           </div>
@@ -749,12 +712,11 @@ setTimeout(async () => {
   const main = async () => {
     try {
       pauseVideo();
-      await sleep(300);
       disableScroll();
       blockScreen();
       //await playUrl(introUrl);
 
-      const rand = getRandomInt(1, 3)
+      const rand = getRandomInt(1, 3);
       if (rand === 1) {
         await memorize();
       } else if (rand === 2) {
@@ -777,7 +739,8 @@ setTimeout(async () => {
     console.log('interval');
 
     // tick only if video is currently playing,
-    if (getVideoState() !== 'playing') {
+    // see https://developers.google.com/youtube/iframe_api_reference
+    if (document.getElementById('movie_player').getPlayerState() !== 1) {
       console.log('skip interval');
       return;
     }
