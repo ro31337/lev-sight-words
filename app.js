@@ -482,11 +482,11 @@ setTimeout(async () => {
 
     return new Promise(async (resolve) => {
       document.getElementById('xx-quiz-' + selectedObj.id).onclick = async () => {
-        if (incorrectCnt === 0) {
-          adjustWeight(selectedObj.word, -1);
-        } else {
-          adjustWeight(selectedObj.word, +1);
-        }
+        // if (incorrectCnt === 0) {
+        //   adjustWeight(selectedObj.word, -1);
+        // } else {
+        //   adjustWeight(selectedObj.word, +1);
+        // }
         initWl();
         await playUrl(correctUrl);
         resolve(incorrectCnt === 0);
