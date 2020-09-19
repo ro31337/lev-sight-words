@@ -482,16 +482,42 @@ setTimeout(async () => {
 
     return new Promise(async (resolve) => {
       document.getElementById('xx-quiz-' + selectedObj.id).onclick = async () => {
-        if (incorrectCnt == 0) {
+        if (incorrectCnt === 0) {
           adjustWeight(selectedObj.word, -1);
         } else {
           adjustWeight(selectedObj.word, +1);
         }
         initWl();
         await playUrl(correctUrl);
-        resolve();
+        resolve(incorrectCnt === 0);
       };
     });
+  };
+
+  const quiz = async () => {
+    // test with the same sequence for now (to be improved later)
+    await playUrl(timeForTestUrl);
+
+    let consecutiveCorrectAnswers = 0;
+    while (consecutiveCorrectAnswers < 3) {
+      const words = wl.peek(3).reduce((acc, x) => {
+        acc.push(x.data);
+        return acc;
+      }, []);
+
+      // Test 3 words
+      for (let i = 0; i < 3; i++) {
+        const selectedObj = words[i];
+        const isCorrect = await showQuiz(selectedObj);
+        if (isCorrect) {
+          consecutiveCorrectAnswers++;
+        } else {
+          consecutiveCorrectAnswers = 0;
+        }
+      }
+    }
+
+    removeElement("xx-quiz");
   };
 
   const memorize = async () => {
@@ -507,20 +533,6 @@ setTimeout(async () => {
       await playUrl(obj.url);
     }
     await playUrl(outroUrl);
-  };
-
-  const quiz = async() => {
-    // test with the same sequence for now (to be improved later)
-    await playUrl(timeForTestUrl);
-    const words = wl.peek(3).reduce((acc, x) => { acc.push(x.data); return acc; }, []);
-
-    // Test 3 words
-    for (let i = 0; i < 3; i++) {
-      const selectedObj = words[i];
-      await showQuiz(selectedObj);
-      // show quiz here
-    }
-    removeElement('xx-quiz');
   };
 
   // Shows single math quiz
