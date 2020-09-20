@@ -9,7 +9,7 @@
 // ==/UserScript==
 
 let gInterval = null;
-const activationInterval = 4;//60 * 15; // in seconds
+const activationInterval = 60 * 12; // in seconds
 
 function addGlobalStyle(css) {
   var head, style;
@@ -520,6 +520,9 @@ setTimeout(async () => {
           consecutiveCorrectAnswers++;
         } else {
           consecutiveCorrectAnswers = 0;
+        }
+        if (consecutiveCorrectAnswers >= 3) {
+          break;
         }
       }
     }
